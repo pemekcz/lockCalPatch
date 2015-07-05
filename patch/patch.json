@@ -1,0 +1,8 @@
+{
+    "name": "Upcoming events on lockscreen",
+    "description": "Shows calendar events for the next seven days on the lockscreen",
+    "category": "homescreen",
+	"infos": {
+        "maintainer": "Anant Gajjar"
+	}
+}

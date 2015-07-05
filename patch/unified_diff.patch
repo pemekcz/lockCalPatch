@@ -1,0 +1,314 @@
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	1970-01-01 01:00:00.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	2015-07-02 06:12:49.000000000 +0100
+@@ -0,0 +1,71 @@
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++Row {
++    property alias eventName: nameLabel.text
++    property alias allDay: timeLabel.allDay
++    property alias startTime: timeLabel.startTime
++    property alias endtime: timeLabel.endTime
++    property alias activeDay: timeLabel.activeDay
++    property alias color: rectangle.color
++    spacing: Theme.paddingSmall
++
++    Rectangle {
++        id: rectangle
++
++        radius: Theme.paddingSmall/3
++        width: Theme.paddingSmall
++        height: parent.height - Theme.paddingSmall/2
++        anchors.verticalCenter: parent.verticalCenter
++    }
++    Column
++    {
++       id: dataCol
++       spacing: Theme.paddingExtraSmall
++       Row {
++            id: labelRow
++            spacing: Theme.paddingSmall
++
++            Text {
++               id: label
++    
++               function fdw(d) {
++                  var t = new Date
++                  var t2 = new Date(d)
++                  var today = new Date(t.getFullYear(), t.getMonth(), t.getDate())
++                  var day = new Date(t2.getFullYear(), t2.getMonth(), t2.getDate())
++                  var delta = (day - today) / 86400000
++                  if (delta == 0) {
++                      //% "Today"
++                      return qsTrId("Today")
++              }else if (delta == 1) {
++                  //% "Tomorrow"
++                  return qsTrId("Tomorrow")
++              } else {
++                  //: Long date pattern without year. Used e.g. in month view.
++                  //% "d MMMM"
++                  return capitalize(Qt.formatDate(d, qsTrId("d MMM")))
++                  }
++              }
++
++              function capitalize(string) {
++                  return string.charAt(0).toUpperCase() + string.substr(1)
++          }
++
++
++              text: fdw(startTime) + ":"
++              //opacity: 0.6
++              font.pixelSize: Theme.fontSizeMedium
++          color: Theme.highlightColor
++            }
++            LockTimeLabel {
++                id: timeLabel
++                //opacity: 0.6
++                font.pixelSize: Theme.fontSizeMedium
++            }
++        }
++        Label {
++            id: nameLabel
++            font.pixelSize: Theme.fontSizeMedium
++        }
++    }
++}
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml	2015-06-25 06:33:45.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml	2015-07-02 23:05:06.000000000 +0100
+@@ -117,6 +117,25 @@ MouseArea {
+         source: "image://theme/graphic-wallpaper-dimmer"
+     }
+ 
++    ShowCalEvents
++    {
++       id: showcalevents
++       anchors 
++       {
++           top: {
++              try {
++                 weatherData.bottom
++              }
++              catch(e) {
++                 networkNameAndDateLabels.bottom
++              }
++           }
++           topMargin: Theme.paddingMedium
++           right: parent.right
++           rightMargin: Theme.paddingMedium
++       }
++    }
++
+     Item {
+         id: networkNameAndDateLabels
+         anchors {
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml	1970-01-01 01:00:00.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml	2015-06-30 12:03:46.000000000 +0100
+@@ -0,0 +1,59 @@
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++
++Label {
++    property bool allDay
++    property date startTime
++    property date endTime
++    property date activeDay
++
++
++function addSuffix(i,todayDate) 
++{
++
++           if((i - todayDate) ==0 ) {
++                return ("Today")
++}
++           if((i - todayDate) ==1 ) {
++                return ("Tomorrow")
++}
++ 
++var j = i % 10
++var k = i % 100
++if (j == 1 && k != 11) { return i + "st" } 
++if (j == 2 && k != 12) { return i + "nd"} 
++if (j == 3 && k != 13) { return i + "rd" } 
++return i + "th" 
++}
++    text: {
++
++       var activeDayStart = new Date(activeDay.getFullYear(), activeDay.getMonth(), activeDay.getDate())
++        var tomorrow = new Date(activeDayStart)
++        tomorrow.setDate(tomorrow.getDate() + 1)
++
++        var _start = startTime
++        var _end = endTime
++
++        if (allDay) {
++            //% "All day"
++
++
++        if (_end.getDate() != _start.getDate()) {
++        return ( "All day - " +  addSuffix(_end.getDate(),activeDayStart.getDate())  ) 
++
++        }
++
++            return qsTrId("All day")
++        }
++
++        if (_end.getDate() != _start.getDate()) {
++        return (Format.formatDate(_start, Formatter.TimeValue) + "-"
++                +  addSuffix(_end.getDate(),activeDayStart.getDate()) + ": " + Format.formatDate(_end, Formatter.TimeValue))
++
++        }
++
++        return (Format.formatDate(_start, Formatter.TimeValue) + "-"
++                + Format.formatDate(_end, Formatter.TimeValue))
++    }
++}
++
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	1970-01-01 01:00:00.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	2015-06-30 18:24:53.000000000 +0100
+@@ -0,0 +1,143 @@
++
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++import org.nemomobile.time 1.0
++import org.nemomobile.calendar 1.0
++
++
++Item
++{
++//width: parent.width
++//height: itemHeight
++width: 415
++height:eventList.count>5 ? eventList.itemHeight*5: eventList.itemHeight*eventList.count 
++          Rectangle {
++            id: background
++            anchors.fill: parent
++            color: "grey"
++            opacity: lipstickSettings.lowPowerMode ? 0.0 : 0.3
++            radius: 1
++        }
++
++        Rectangle {
++            id: background_border
++            anchors.left: parent.left
++            anchors.fill: parent
++            border.color: lipstickSettings.lowPowerMode ? Theme.highlightColor : Theme.secondaryColor
++            border.width: 1
++            color: "transparent"
++            radius: 1
++        }
++
++   WallClock 
++        {
++           id: wallClock
++
++           // TODO: only update when Switcher is visible
++           enabled: !app.applicationActive
++           updateFrequency: WallClock.Day
++           onSystemTimeUpdated: 
++           {
++               eventUpdater.interval = 1000
++               eventUpdater.update()
++            }
++        }
++        Item 
++        {
++            x: Theme.paddingSmall
++            width: parent.width
++            height: eventList.height
++
++            ListModel 
++            {
++                id: activeAndComing
++            }
++
++            Timer 
++            {
++                id: eventUpdater
++
++                onTriggered: update()
++
++                function update() 
++                {
++                    activeAndComing.clear()
++
++                    var now = new Date
++                    var nextEnding = undefined
++
++                    for (var i = 0; i < allEvents.count; ++i) 
++                    {
++                        var occurrence = allEvents.get(i, AgendaModel.OccurrenceObjectRole)
++                        var event = allEvents.get(i, AgendaModel.EventObjectRole)
++
++                        if (event.allDay || now < occurrence.endTime) 
++                        {
++                            activeAndComing.append({ displayLabel: event.displayLabel, allDay: event.allDay,
++                                                       startTime: occurrence.startTime, endTime: occurrence.endTime,
++evDay: occurrence.time,
++                                                       color: event.color })
++
++                            if (!event.allDay && (nextEnding == undefined || occurrence.endTime < nextEnding)) 
++                            {
++                                nextEnding = occurrence.endTime
++                            }
++                        }
++                    }
++
++                    if (nextEnding !== undefined) 
++                    {
++                        var timeout = Math.max(0, nextEnding.getTime() - now.getTime() + 1000)
++                        if (timeout > 0)
++                        {
++                            eventUpdater.interval = timeout
++                            eventUpdater.start()
++                        } else 
++                        {
++                            eventUpdater.stop()
++                        }
++                    } else 
++                    {
++                        eventUpdater.stop()
++                    }
++                }
++            }
++
++            AgendaModel 
++            {
++                id: allEvents
++                startDate: wallClock.time
++                onUpdated: eventUpdater.update()
++                endDate: QtDate.addDays(wallClock.time, 7)  
++            }
++
++            ListView 
++            {
++                id: eventList
++
++                property real itemHeight
++
++                clip: true
++                model: activeAndComing
++                interactive: false
++                width: parent.width
++                height: 5*itemHeight  
++                spacing: Theme.paddingExtraSmall
++                visible: count > 0
++                delegate: LockEventItem
++                {
++                    eventName: model.displayLabel
++                    allDay: model.allDay
++                    startTime: model.startTime
++                    endtime: model.endTime
++                    //activeDay: model.evDay
++                    activeDay: wallClock.time
++                    color: model.color
++                    Component.onCompleted: eventList.itemHeight = height
++                }
++            }
++        } 
++     
++}
++ 
++
