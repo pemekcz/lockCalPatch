@@ -1,10 +1,76 @@
-diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml
---- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	2015-07-02 06:12:49.000000000 +0100
-@@ -0,0 +1,71 @@
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/BorderRectangle.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/BorderRectangle.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/BorderRectangle.qml	1970-01-01 01:00:00.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/BorderRectangle.qml	2015-07-28 11:06:00.000000000 +0100
+@@ -0,0 +1,52 @@
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
++
++Item
++{
++    id: item
++    property alias backColor: background.color
++    property alias rightColor: rightBorder.color
++    property alias leftColor: leftBorder.color
++    property alias topColor: topBorder.color
++    property alias bottomColor: bottomBorder.color
++    property int borderWidth: 2
++    Rectangle 
++    {
++        id: background
++        anchors.fill: parent
++        //anchors.rightMargin: 2
++        //anchors.leftMargin: 2
++        //anchors.topMargin: 2
++        //anchors.bottomMargin: 2
++        opacity: parent.opacity
++        radius: 1
++    }
++    Rectangle 
++    {
++        id: rightBorder 
++        anchors.right: background.right
++        height: parent.height 
++        width: parent.borderWidth
++   }
++    Rectangle 
++    {
++        id: leftBorder 
++        anchors.left: background.left
++        height: parent.height 
++        width: parent.borderWidth
++   } 
++    Rectangle 
++    {
++        id: topBorder 
++        anchors.top: background.top
++        height: parent.borderWidth 
++        width: parent.width
++   }
++     Rectangle 
++    {
++        id: bottomBorder 
++        anchors.bottom: background.bottom
++        height: parent.borderWidth 
++        width: parent.width
++   }  
++}
+\ No newline at end of file
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	1970-01-01 01:00:00.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	2015-07-28 23:31:34.000000000 +0100
+@@ -0,0 +1,74 @@
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++
 +Row {
++
++        property alias dateLabelColor: dateLabel.color
++        property alias timeLabelColor: timeLabel.color
++        property alias eventLabelColor: nameLabel.color
++        property alias dateLabelSize: dateLabel.font.pixelSize
++        property alias timeLabelSize: timeLabel.font.pixelSize
++        property alias eventLabelSize: nameLabel.font.pixelSize
++
 +    property alias eventName: nameLabel.text
 +    property alias allDay: timeLabel.allDay
 +    property alias startTime: timeLabel.startTime
@@ -24,13 +90,13 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.q
 +    Column
 +    {
 +       id: dataCol
-+       spacing: Theme.paddingExtraSmall
++       spacing: Theme.paddingSmall/3
 +       Row {
 +            id: labelRow
 +            spacing: Theme.paddingSmall
 +
-+            Text {
-+               id: label
++            Label {
++               id: dateLabel
 +    
 +               function fdw(d) {
 +                  var t = new Date
@@ -57,19 +123,13 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.q
 +
 +
 +              text: fdw(startTime) + ":"
-+              //opacity: 0.6
-+              font.pixelSize: Theme.fontSizeMedium
-+          color: Theme.highlightColor
 +            }
 +            LockTimeLabel {
 +                id: timeLabel
-+                //opacity: 0.6
-+                font.pixelSize: Theme.fontSizeMedium
 +            }
 +        }
 +        Label {
 +            id: nameLabel
-+            font.pixelSize: Theme.fontSizeMedium
 +        }
 +    }
 +}
@@ -167,38 +227,69 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.q
 +
 diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml
 --- original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	2015-06-30 18:24:53.000000000 +0100
-@@ -0,0 +1,143 @@
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	2015-07-28 23:31:10.000000000 +0100
+@@ -0,0 +1,192 @@
 +
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
 +import org.nemomobile.time 1.0
 +import org.nemomobile.calendar 1.0
-+
++import org.nemomobile.configuration 1.0
 +
 +Item
 +{
++ConfigurationGroup {
++        id: lockscreenUpcomingSettings
++        path: "/desktop/lipstick-jolla-home/lockscreenUpcoming"
++        property int maxEvents: 5
++        property int nDaysForward: 7
++        property int daysWeeksMonths: 0
++        property color backgroundColor: "grey"
++        property color tBorder: "white"
++        property color bBorder: "white"
++        property color lBorder: "white"
++        property color rBorder: "white"
++        property bool bgrIsTr: false
++        property bool tbrIsTr: false
++        property bool bbrIsTr: false
++        property bool lbrIsTr: false
++        property bool rbrIsTr: false
++        property int borderThick: 2
++        
++        property int dateLabelSize: Theme.fontSizeMedium
++        property int timeLabelSize: Theme.fontSizeMedium
++        property int eventLabelSize: Theme.fontSizeMedium
++        property color dateLabelColor: Theme.highlightColor
++        property color timeLabelColor: Theme.primaryColor
++        property color eventLabelColor: Theme.primaryColor
++           onValueChanged: 
++           {
++               eventUpdater.interval = 1000
++               eventUpdater.update()
++            }
++    }
 +//width: parent.width
 +//height: itemHeight
 +width: 415
-+height:eventList.count>5 ? eventList.itemHeight*5: eventList.itemHeight*eventList.count 
++height:eventList.count> lockscreenUpcomingSettings.maxEvents ? eventList.itemHeight*lockscreenUpcomingSettings.maxEvents + 2* lockscreenUpcomingSettings.borderThick : eventList.itemHeight*eventList.count+ 2* lockscreenUpcomingSettings.borderThick
++anchors.right: parent.right 
 +          Rectangle {
 +            id: background
 +            anchors.fill: parent
-+            color: "grey"
++            color:lockscreenUpcomingSettings.bgrIsTr ? "transparent" : lockscreenUpcomingSettings.backgroundColor 
 +            opacity: lipstickSettings.lowPowerMode ? 0.0 : 0.3
 +            radius: 1
 +        }
-+
-+        Rectangle {
-+            id: background_border
-+            anchors.left: parent.left
-+            anchors.fill: parent
-+            border.color: lipstickSettings.lowPowerMode ? Theme.highlightColor : Theme.secondaryColor
-+            border.width: 1
-+            color: "transparent"
-+            radius: 1
-+        }
++        BorderRectangle {
++                      id: borders
++                      anchors.fill: parent
++                      backColor: "transparent"
++                      rightColor: lockscreenUpcomingSettings.rbrIsTr ? "transparent" : (lipstickSettings.lowPowerMode ?Theme.highlightColor :lockscreenUpcomingSettings.rBorder)
++                      leftColor: lockscreenUpcomingSettings.lbrIsTr ? "transparent" :(lipstickSettings.lowPowerMode ?Theme.highlightColor :lockscreenUpcomingSettings.lBorder)
++                      topColor: lockscreenUpcomingSettings.tbrIsTr ? "transparent" :(lipstickSettings.lowPowerMode ?Theme.highlightColor :lockscreenUpcomingSettings.tBorder)
++                      bottomColor: lockscreenUpcomingSettings.bbrIsTr ? "transparent" :(lipstickSettings.lowPowerMode ?Theme.highlightColor :lockscreenUpcomingSettings.bBorder)
++                      borderWidth: lockscreenUpcomingSettings.borderThick
++}
 +
 +   WallClock 
 +        {
@@ -215,9 +306,10 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.q
 +        }
 +        Item 
 +        {
-+            x: Theme.paddingSmall
++            x: lockscreenUpcomingSettings.borderThick + Theme.paddingSmall
++y:lockscreenUpcomingSettings.borderThick
 +            width: parent.width
-+            height: eventList.height
++            height: parent.height
 +
 +            ListModel 
 +            {
@@ -249,27 +341,12 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.q
 +evDay: occurrence.time,
 +                                                       color: event.color })
 +
++
 +                            if (!event.allDay && (nextEnding == undefined || occurrence.endTime < nextEnding)) 
 +                            {
 +                                nextEnding = occurrence.endTime
 +                            }
 +                        }
-+                    }
-+
-+                    if (nextEnding !== undefined) 
-+                    {
-+                        var timeout = Math.max(0, nextEnding.getTime() - now.getTime() + 1000)
-+                        if (timeout > 0)
-+                        {
-+                            eventUpdater.interval = timeout
-+                            eventUpdater.start()
-+                        } else 
-+                        {
-+                            eventUpdater.stop()
-+                        }
-+                    } else 
-+                    {
-+                        eventUpdater.stop()
 +                    }
 +                }
 +            }
@@ -279,7 +356,31 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.q
 +                id: allEvents
 +                startDate: wallClock.time
 +                onUpdated: eventUpdater.update()
-+                endDate: QtDate.addDays(wallClock.time, 7)  
++
++                function getEndDate() {
++switch(lockscreenUpcomingSettings.daysWeeksMonths) {
++            case 0:{ return  QtDate.addDays(wallClock.time, lockscreenUpcomingSettings.nDaysForward)
++break
++            }
++            case 1:{ return QtDate.addDays(wallClock.time, lockscreenUpcomingSettings.nDaysForward *7)
++break
++            }
++            case 2:{
++var addM =lockscreenUpcomingSettings.nDaysForward
++var addY = 0
++if (addM >12) {
++addM = addM - 12
++addY = 1
++}
++ 
++var endDate = new Date(wallClock.time.getFullYear()+addY, wallClock.time.getMonth() + addM, wallClock.time.getDate())
++return endDate
++break
++           }
++      }
++           
++ }
++  endDate: getEndDate()
 +            }
 +
 +            ListView 
@@ -292,8 +393,8 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.q
 +                model: activeAndComing
 +                interactive: false
 +                width: parent.width
-+                height: 5*itemHeight  
-+                spacing: Theme.paddingExtraSmall
++                height: eventList.count> lockscreenUpcomingSettings.maxEvents ? eventList.itemHeight*lockscreenUpcomingSettings.maxEvents : eventList.itemHeight*eventList.count
++                //spacing: Theme.paddingSmall
 +                visible: count > 0
 +                delegate: LockEventItem
 +                {
@@ -304,7 +405,15 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.q
 +                    //activeDay: model.evDay
 +                    activeDay: wallClock.time
 +                    color: model.color
-+                    Component.onCompleted: eventList.itemHeight = height
++
++                    dateLabelColor: lockscreenUpcomingSettings.dateLabelColor
++                    timeLabelColor: lockscreenUpcomingSettings.timeLabelColor
++                    eventLabelColor: lockscreenUpcomingSettings.eventLabelColor
++                    dateLabelSize: lockscreenUpcomingSettings.dateLabelSize
++                    timeLabelSize: lockscreenUpcomingSettings.timeLabelSize
++                    eventLabelSize: lockscreenUpcomingSettings.eventLabelSize
++
++                    Component.onCompleted: eventList.itemHeight = height  
 +                }
 +            }
 +        } 

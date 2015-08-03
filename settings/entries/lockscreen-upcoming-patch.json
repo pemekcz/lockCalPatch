@@ -1,0 +1,16 @@
+{
+    "translation_catalog": "lockscreen-upcoming-patch",
+    "entries": [
+        {
+            "path": "system_settings/look_and_feel/lockscreen-upcoming-patch",
+            "type": "page",
+            "title": "Lockscreen calendar",
+            "translation_id": "lockscreen-upcoming-patch-title",
+            "icon": "/usr/share/jolla-settings/pages/lockscreen-upcoming-patch/icon-m-cal-set.png",
+            "order": 5000,
+            "params": {
+                "source": "/usr/share/jolla-settings/pages/lockscreen-upcoming-patch/main.qml"
+            }
+        }
+    ]
+}

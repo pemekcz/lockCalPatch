@@ -1,0 +1,19 @@
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import org.nemomobile.configuration 1.0
+
+Page {
+    id: page
+ 
+    ConfigurationGroup {
+        id: lockscreenUpcomingSettings
+        path: "/desktop/lipstick-jolla-home/lockscreenUpcoming"
+        property int maxEvents: 5
+        property int nDaysForward: 7
+        property int daysWeeksMonths: 0
+        property color backgroundColor: "grey"
+        property color tBorder: "white"
+        property color bBorder: "white"
+        property color lBorder: "white"
+        property color rBorder: "white"
+        property bool bg
