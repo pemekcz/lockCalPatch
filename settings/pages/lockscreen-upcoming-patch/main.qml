@@ -28,7 +28,7 @@ Page {
         property color dateLabelColor: Theme.highlightColor
         property color timeLabelColor: Theme.primaryColor
         property color eventLabelColor: Theme.primaryColor
-
+        property bool showMessage: false
     }
 
     SilicaFlickable {
@@ -105,6 +105,14 @@ Page {
                    }
                }
             }
+
+            TextSwitch {
+                width: parent.width
+                text: "Show no events message"
+                checked: lockscreenUpcomingSettings.showMessage
+                onClicked: lockscreenUpcomingSettings.showMessage = checked
+            }
+
             SectionHeader {
                 text: "Background"
             }
