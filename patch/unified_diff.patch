@@ -53,13 +53,14 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/BorderRectangle
 \ No newline at end of file
 diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml
 --- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	2015-08-27 07:51:22.000000000 +0100
-@@ -0,0 +1,72 @@
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.qml	2015-09-21 22:45:33.000000000 +0100
+@@ -0,0 +1,110 @@
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
 +
 +Row {
-+
++        id: dataRow
++        width: parent.width
 +        property alias dateLabelColor: dateLabel.color
 +        property alias timeLabelColor: timeLabel.color
 +        property alias eventLabelColor: nameLabel.color
@@ -124,38 +125,95 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.q
 +        Label 
 +        {
 +            id: nameLabel
++            width: contentWidth
 +        }
 +    }
++    function runAnimation()
++{
++scrollAnimation.initialise(nameLabel,dataRow.width  - nameLabel.width - Theme.paddingLarge)
++if(nameLabel.width - dataRow.width > 0 ) scrollAnimation.start()
 +}
-diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml
---- original/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml	2015-06-25 06:33:45.000000000 +0100
-+++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/Lockscreen.qml	2015-09-04 11:56:57.000000000 +0100
-@@ -370,6 +370,25 @@ MouseArea {
-         }
-     }
- 
-+    ShowCalEvents
-+    {
-+       id: showcalevents
-+       anchors 
-+       {
-+           top: {
-+              try {
-+                 weatherData.bottom
-+              }
-+              catch(e) {
-+                 networkNameAndDateLabels.bottom
-+              }
-+           }
-+           topMargin: Theme.paddingMedium
-+           right: parent.right
-+           rightMargin: Theme.paddingMedium
-+       }
-+    }
 +
-     Timer {
-         id: hideDateTimer
-         interval: 3000
++        SequentialAnimation
++        {
++            id: scrollAnimation
++            function initialise(targetItem, offset) 
++            {
++                target = targetItem
++                range = offset
++            }
++
++            property Item target
++            property real range
++
++            loops: 3
++        PauseAnimation { duration: 1000 }
++            PropertyAnimation
++            {
++               target: scrollAnimation.target
++               property: "x"
++               duration:  -scrollAnimation.range*20
++               to: scrollAnimation.range 
++            }
++            PropertyAnimation
++            {
++               target: scrollAnimation.target
++
++               duration: -scrollAnimation.range * 20
++               property: "x"
++               to:0
++            }
++        }
++}
+diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml	2015-09-15 23:30:40.000000000 +0100
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml	2015-09-21 22:31:20.000000000 +0100
+@@ -126,6 +126,45 @@ SilicaFlickable {
+             }
+         }
+ 
++        ShowCalEvents
++        {
++           id: showcalevents
++           anchors 
++           {
++               top: {
++                  try {
++                     weatherData.bottom
++                  }
++                  catch(e) {
++                     clock.bottom
++                  }
++               }
++               topMargin: Theme.paddingMedium
++               right: parent.right
++               rightMargin: Theme.paddingMedium
++           }
++           state: "hidden"
++           states: [
++               State 
++               {
++                   name: "hinting"
++                   when: lockScreen.locked && !lockScreen.panning && lockItem.allowAnimations
++                   StateChangeScript
++                   {
++                       //name: "myScript"
++                       script:
++                       {
++                           showcalevents.runAnimations()
++                       }
++                   }                   
++               },
++               State
++               {
++                   name: "hidden"
++               }
++           ]
++        }
++
+         Clock {
+             id: clock
+ 
 diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml
 --- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml	1970-01-01 01:00:00.000000000 +0100
 +++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.qml	2015-08-27 07:51:22.000000000 +0100
@@ -213,8 +271,8 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockTimeLabel.q
 +
 diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml
 --- original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	2015-09-03 07:53:56.000000000 +0100
-@@ -0,0 +1,252 @@
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.qml	2015-09-22 16:53:54.000000000 +0100
+@@ -0,0 +1,261 @@
 +
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
@@ -462,6 +520,15 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/ShowCalEvents.q
 +
 +                Component.onCompleted: eventList.itemHeight = height  
 +            }
++        }
++    }
++    function runAnimations()
++    {
++    var listItems = eventList.count> lockscreenUpcomingSettings.maxEvents ? lockscreenUpcomingSettings.maxEvents :  eventList.count
++        for (var i = 0; i < listItems; ++i) 
++        {
++            eventList.currentIndex = i
++eventList.currentItem.runAnimation()
 +        }
 +    } 
 +}

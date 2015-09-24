@@ -1,6 +1,6 @@
 Name:          lockscreen-upcoming
-Version:       0.3
-Release:       1
+Version:       0.4
+Release:       2
 Summary:       Lock screen patch
 Group:         System/Patches
 Vendor:        Anant Gajjar
@@ -8,6 +8,7 @@ Distribution:  SailfishOS
 Packager: Anant Gajjar
 License:       GPL
 Requires: patchmanager
+Requires: sailfish-version >= 1.1.9
 
 %description
 This is a patch for the lockscreen to show the upcoming events. The view is fully configurable using the settings.
@@ -50,7 +51,10 @@ fi
 fi
 
 %changelog
-*  Fri Sep 04 2015 Builder <builder@...>
+*  Mon Sep 21 2015 Builder <builder@...>
+0.4
+- Compatible with sailfish version 1.1.9.28
+- Added scrolling text for long event names
 0.3
 - Added message for no events, option to show is in settings
 - Fixed bug where finished event would not be removed
