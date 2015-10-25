@@ -76,6 +76,13 @@ diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockEventItem.q
 +    property alias color: rectangle.color
 +    spacing: Theme.paddingSmall
 +
++    Connections {
++        target: lockScreen
++        onLockedChanged: {
++           if (!lockScreen.locked) scrollAnimation.stop()
++        }
++    }
++
 +    Rectangle 
 +    {
 +        id: rectangle
