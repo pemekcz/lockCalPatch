@@ -1,6 +1,6 @@
 Name:          lockscreen-upcoming
-Version:       0.4
-Release:       2
+Version:       0.5
+Release:       1
 Summary:       Lock screen patch
 Group:         System/Patches
 Vendor:        Anant Gajjar
@@ -9,6 +9,7 @@ Packager: Anant Gajjar
 License:       GPL
 Requires: patchmanager
 Requires: sailfish-version >= 1.1.9
+BuildArch: noarch
 
 %description
 This is a patch for the lockscreen to show the upcoming events. The view is fully configurable using the settings.
@@ -52,6 +53,9 @@ fi
 
 %changelog
 *  Mon Sep 21 2015 Builder <builder@...>
+0.5
+- Stop animations on lockscreen exit (Thanks Ajalkane for the code contributed)
+- Built with noarch
 0.4
 - Compatible with sailfish version 1.1.9.28
 - Added scrolling text for long event names
