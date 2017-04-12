@@ -1,5 +1,5 @@
 Name:          lockscreen-upcoming
-Version:       0.5
+Version:       0.6
 Release:       1
 Summary:       Lock screen patch
 Group:         System/Patches
@@ -16,6 +16,7 @@ This is a patch for the lockscreen to show the upcoming events. The view is full
 
 %files
 /usr/share/patchmanager/patches/*
+/usr/share/lipstick-jolla-home-qt5/lockscreen/*
 /usr/share/jolla-settings/entries/*
 /usr/share/jolla-settings/pages/*
 
@@ -27,14 +28,6 @@ This is a patch for the lockscreen to show the upcoming events. The view is full
     // Do stuff specific to uninstalls
 if [ -f /usr/sbin/patchmanager ]; then
 /usr/sbin/patchmanager -u lockscreen-upcoming || true
-rm -f /usr/share/lipstick-jolla-
-home-qt5/lockscreen/BorderRectangle.qml || true
-rm -f /usr/share/lipstick-jolla-
-home-qt5/lockscreen/LockTimeLabel.qml || true
-rm -f /usr/share/lipstick-jolla-
-home-qt5/lockscreen/LockEventItem.qml || true
-rm -f /usr/share/lipstick-jolla-
-home-qt5/lockscreen/ShowCalEvents.qml || true
 fi
 
 %postun
@@ -53,6 +46,9 @@ fi
 
 %changelog
 *  Mon Sep 21 2015 Builder <builder@...>
+0.6
+- Implemented setting to change position
+- Additional required files are now installed rather than patched
 0.5
 - Stop animations on lockscreen exit (Thanks Ajalkane for the code contributed)
 - Built with noarch
