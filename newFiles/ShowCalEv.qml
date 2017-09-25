@@ -116,7 +116,7 @@ y:lockscreenUpcomingSettings.borderThick
     {
         x: lockscreenUpcomingSettings.borderThick + Theme.paddingSmall
 y:lockscreenUpcomingSettings.borderThick
-        width: parent.width
+        width: parent.width - x
         height: parent.height
 
         ListModel 

@@ -81,7 +81,7 @@ Row {
     function runAnimation()
 {
 scrollAnimation.initialise(nameLabel,dataRow.width  - nameLabel.width - Theme.paddingLarge)
-if(nameLabel.width - dataRow.width > 0 ) scrollAnimation.start()
+if(nameLabel.width + Theme.paddingLarge - dataRow.width > 0 ) scrollAnimation.start()
 }
 
         SequentialAnimation

@@ -1,5 +1,5 @@
 Name:          lockscreen-upcoming
-Version:       0.6
+Version:       0.7
 Release:       1
 Summary:       Lock screen patch
 Group:         System/Patches
@@ -46,6 +46,8 @@ fi
 
 %changelog
 *  Mon Sep 21 2015 Builder <builder@...>
+0 7
+- Bug fix - content not scrolling and out of frame (https://github.com/anigaj/lockCalPatch/issues/2)
 0.6
 - Implemented setting to change position
 - Additional required files are now installed rather than patched
