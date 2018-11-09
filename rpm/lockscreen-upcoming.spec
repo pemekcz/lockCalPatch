@@ -1,5 +1,5 @@
 Name:          lockscreen-upcoming
-Version:       0.7
+Version:       0.8
 Release:       1
 Summary:       Lock screen patch
 Group:         System/Patches
@@ -8,7 +8,7 @@ Distribution:  SailfishOS
 Packager: Anant Gajjar
 License:       GPL
 Requires: patchmanager
-Requires: sailfish-version >= 1.1.9
+Requires: sailfish-version >= 3.0
 BuildArch: noarch
 
 %description
@@ -46,6 +46,8 @@ fi
 
 %changelog
 *  Mon Sep 21 2015 Builder <builder@...>
+0.8
+- Compatible with Sailfish 3.0
 0 7
 - Bug fix - content not scrolling and out of frame (https://github.com/anigaj/lockCalPatch/issues/2)
 0.6

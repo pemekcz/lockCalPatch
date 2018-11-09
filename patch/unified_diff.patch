@@ -1,10 +1,19 @@
 diff -rupN original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml
---- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml	2017-03-01 07:49:54.000000000 +0000
-+++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml	2017-03-16 07:33:42.000000000 +0000
-@@ -260,6 +260,46 @@ SilicaFlickable {
-             }
-         }
+--- original/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml	2018-11-09 07:30:43.873841660 +0000
++++ patch/usr/share/lipstick-jolla-home-qt5/lockscreen/LockItem.qml	2018-11-09 08:15:46.599327595 +0000
+@@ -13,6 +13,7 @@ import Nemo.DBus 2.0
+ import com.jolla.lipstick 0.1
+ import com.jolla.settings.system 1.0
+ import org.nemomobile.lipstick 0.1
++import org.nemomobile.configuration 1.0
+ import "../main"
+ import "../statusarea"
  
+@@ -117,7 +118,46 @@ SilicaFlickable {
+ 
+         width: lockItem.width
+         height: lockItem.height - y
+-
 +        ConfigurationGroup {
 +            id: lockscreenUpcomingSettings
 +            path: "/desktop/lipstick-jolla-home/lockscreenUpcoming"
